@@ -7,6 +7,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/FirebaseAuthContext";
 import { getApiKey, saveApiKey } from "@/api/ceogpsclient.jsx";
+import { kvGet, kvSet } from "@/utils/storage";
 
 function LogoSVG() {
   return (
@@ -77,7 +78,7 @@ export default function Sidebar({ active, setActive }) {
     
     const loadLogo = async () => {
       try {
-        const pic = await getApiKey("logo_pic");
+        const pic = await kvGet("logo_pic");
         if (isMounted && pic) {
           setLogoPic(pic);
         }
@@ -102,9 +103,8 @@ export default function Sidebar({ active, setActive }) {
       reader.onload = async () => {
         const dataUrl = reader.result;
         setLogoPic(dataUrl);
-        const safe = dataUrl.length > 51200 ? dataUrl.substring(0, 51200) : dataUrl;
-        const uid = fbUser?.uid || fbUser?.id;
-        await saveApiKey("logo_pic", safe, uid);
+        // Full image to Worker KV (global, survives logout, no quota/uid issues).
+        await kvSet("logo_pic", dataUrl);
       };
       reader.readAsDataURL(file);
     } catch (error) {

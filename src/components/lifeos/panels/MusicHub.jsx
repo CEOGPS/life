@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Icon from "@/components/lifeos/icons/Icon";
+import { uploadToR2, kvGet, kvSet } from "@/utils/storage";
 
 // ─── THEME ─────────────────────────────────────────────────────────────────
 const C = {
@@ -40,10 +41,10 @@ const MUSIC_SYS = "You are a music AI assistant for Chris Green's LifeOS1 Music 
 
 async function callAI(prompt) {
   try {
-    const res = await fetch("https://lifeos1.ceogps.workers.dev/api/ai/generate", {
+    const res = await fetch("https://lifeos1.ceogps.workers.dev/api/llm/invoke", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt, system: MUSIC_SYS, max_tokens: 800 }),
+      body: JSON.stringify({ prompt, system: MUSIC_SYS, model: "auto" }),
     });
     const data = await res.json();
     return data?.text || "[No response]";
@@ -74,9 +75,24 @@ export default function MusicHub() {
   const coverRef  = useRef(null);
   const coverPlId = useRef(null);
 
-  // Persist playlists and tracks
-  useEffect(() => { saveLS("lifeos_music_playlists", playlists); }, [playlists]);
-  useEffect(() => { saveLS("lifeos_music_tracks", tracks); }, [tracks]);
+  // Persist playlists and tracks — hydrate from Worker KV (authoritative, survives
+  // logout & other devices), then mirror every change to KV + localStorage.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    (async () => {
+      try {
+        const [pl, tr] = await Promise.all([
+          kvGet("lifeos_music_playlists"),
+          kvGet("lifeos_music_tracks"),
+        ]);
+        if (Array.isArray(pl) && pl.length) setPlaylists(pl);
+        if (Array.isArray(tr)) setTracks(tr);
+      } catch {}
+      setHydrated(true);
+    })();
+  }, []);
+  useEffect(() => { if (hydrated) { saveLS("lifeos_music_playlists", playlists); kvSet("lifeos_music_playlists", playlists); } }, [playlists, hydrated]);
+  useEffect(() => { if (hydrated) { saveLS("lifeos_music_tracks", tracks); kvSet("lifeos_music_tracks", tracks); } }, [tracks, hydrated]);
 
   // Audio progress
   useEffect(() => {
@@ -146,35 +162,32 @@ export default function MusicHub() {
     audio.currentTime = ratio * audio.duration;
   }
 
-  // Upload audio files
+  // Upload audio files — store in R2 (persistent URL), NOT as data URLs in
+  // localStorage (which blows the ~5MB quota and silently loses everything).
   function handleUpload(e) {
-    Array.from(e.target.files || []).forEach(f => {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const url = reader.result; // data: URL for persistence across reloads
-        const id = `track_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-        const name = f.name.replace(/\.[^.]+$/, "");
-        const newTrack = { id, name, artist: "Unknown", url, size: `${(f.size / 1024 / 1024).toFixed(1)} MB`, added: new Date().toLocaleDateString() };
-        setTracks(prev => [...prev, newTrack]);
-        if (activePl) {
-          setPlaylists(prev => prev.map(p => p.id === activePl ? { ...p, tracks: [...p.tracks, id] } : p));
-        }
-      };
-      reader.readAsDataURL(f);
+    const targetPl = activePl;
+    Array.from(e.target.files || []).forEach(async (f) => {
+      const up = await uploadToR2(f, "music");
+      const id = `track_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      const name = f.name.replace(/\.[^.]+$/, "");
+      const newTrack = { id, name, artist: "Unknown", url: up.url, size: `${(f.size / 1024 / 1024).toFixed(1)} MB`, added: new Date().toLocaleDateString() };
+      setTracks(prev => [...prev, newTrack]);
+      if (targetPl) {
+        setPlaylists(prev => prev.map(p => p.id === targetPl ? { ...p, tracks: [...p.tracks, id] } : p));
+      }
     });
     e.target.value = "";
   }
 
-  // Cover art upload
+  // Cover art upload — also to R2
   function handleCoverUpload(e) {
     const f = e.target.files?.[0];
     if (!f || !coverPlId.current) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const url = reader.result;
-      setPlaylists(prev => prev.map(p => p.id === coverPlId.current ? { ...p, cover: url } : p));
-    };
-    reader.readAsDataURL(f);
+    const plId = coverPlId.current;
+    (async () => {
+      const up = await uploadToR2(f, "music");
+      setPlaylists(prev => prev.map(p => p.id === plId ? { ...p, cover: up.url } : p));
+    })();
     e.target.value = "";
   }
 

@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import Icon from "@/components/lifeos/icons/Icon";
+import { uploadToR2, kvGet, kvSet } from "@/utils/storage";
 import VideoGeneratorUI from "./VideoGeneratorUI";
 import ImageStudioUI from "./ImageStudioUI";
 import WritingHubUI from "./WritingHubUI";
@@ -96,19 +97,32 @@ export default function MediaPanel() {
   const [cloudModal, setCloudModal] = useState(null); // { provider, name, fields }
   const [cloudFormVals, setCloudFormVals] = useState({});
 
-  // ── Persist to localStorage whenever state changes ────────────────────────
+  // ── Persist + hydrate via Worker KV (survives logout; localStorage mirror) ──
+  const [mediaHydrated, setMediaHydrated] = useState(false);
   useEffect(() => {
-    // Don't store objectURL-only files (they die on refresh) — store base64 ones
-    const toStore = files.map(f => {
-      const { _objectUrl, ...rest } = f;
-      return rest;
-    });
+    (async () => {
+      try {
+        const [fl, al] = await Promise.all([
+          kvGet("lifeos_media_files_v2"),
+          kvGet("lifeos_media_albums_v2"),
+        ]);
+        if (Array.isArray(fl)) setFiles(fl);
+        if (Array.isArray(al)) setAlbums(al);
+      } catch {}
+      setMediaHydrated(true);
+    })();
+  }, []);
+  useEffect(() => {
+    if (!mediaHydrated) return;
+    const toStore = files.map(f => { const { _objectUrl, ...rest } = f; return rest; });
     saveLS("lifeos_media_files_v2", toStore);
-  }, [files]);
-
+    kvSet("lifeos_media_files_v2", toStore);
+  }, [files, mediaHydrated]);
   useEffect(() => {
+    if (!mediaHydrated) return;
     saveLS("lifeos_media_albums_v2", albums);
-  }, [albums]);
+    kvSet("lifeos_media_albums_v2", albums);
+  }, [albums, mediaHydrated]);
 
   // ── Computed ──────────────────────────────────────────────────────────────
   const tabAlbums = albums.filter(a => a.type === tab);
@@ -325,19 +339,11 @@ export default function MediaPanel() {
       const now = new Date();
       const dateStr = now.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 
-      let url    = null;
-      let stored = false;
-
-      if (ftype === "Images" && f.size <= 3 * 1024 * 1024) {
-        // Store images < 3 MB as base64 — truly persistent
-        url    = await toBase64(f);
-        stored = true;
-      } else if (ftype === "Images") {
-        // Large image — objectURL for session only
-        url = URL.createObjectURL(f);
-      } else if (ftype === "Videos" || ftype === "Music") {
-        url = URL.createObjectURL(f);
-      }
+      // Upload every file to R2 for true persistence. Data URLs / objectURLs
+      // blow the localStorage quota and vanish on reload/logout.
+      const up = await uploadToR2(f, ftype.toLowerCase());
+      const url = up.url;
+      const stored = up.ok;
 
       return {
         id,
@@ -370,7 +376,8 @@ export default function MediaPanel() {
   async function handleCoverUpload(e) {
     const f = e.target.files?.[0];
     if (!f || !coverTargetAlbum) return;
-    const url = await toBase64(f);
+    const up = await uploadToR2(f, "images");
+    const url = up.url;
     setAlbums(prev => prev.map(a => a.id === coverTargetAlbum ? { ...a, cover: url } : a));
     setCoverTargetAlbum(null);
     if (coverInputRef.current) coverInputRef.current.value = "";
@@ -1211,4 +1218,69 @@ function FileGrid({ files, tab, onOpen, onDelete, onEdit, albums, assignToAlbum 
   }
 }
 
-// ── Image Card ────────────────────────────────────────────────────────�
+// ── Image Card ─────────────────────────────
+const mediaIconBtn = {
+  width: 24, height: 24, borderRadius: 6, background: "rgba(0,0,0,0.6)",
+  border: "none", color: "#fff", cursor: "pointer",
+  display: "flex", alignItems: "center", justifyContent: "center",
+};
+
+function ImageCard({ file, onOpen, onDelete, onEdit, albums, assignToAlbum, assignMenu, setAssignMenu }) {
+  const [hover, setHover] = useState(false);
+  const menuOpen = assignMenu === file.id;
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ position: "relative", background: C.card2, border: `0.5px solid ${C.border}`, borderRadius: 10, overflow: "hidden", transition: "transform .15s, box-shadow .15s", transform: hover ? "translateY(-2px)" : "none", boxShadow: hover ? "0 8px 24px rgba(0,0,0,0.5)" : "none" }}>
+      <div style={{ height: 130, background: "#000", cursor: "pointer", position: "relative" }} onClick={() => file.url && onOpen(file)}>
+        {file.url
+          ? <img src={file.url} alt={file.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          : <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><Icon name="🖼" size={28} /></div>}
+        {file.stored === false && (
+          <div style={{ position: "absolute", top: 6, left: 6, fontSize: 8, padding: "2px 6px", borderRadius: 10, background: "rgba(255,140,66,0.85)", color: "#000", fontWeight: 700 }}>SESSION</div>
+        )}
+        {hover && (
+          <div style={{ position: "absolute", top: 6, right: 6, display: "flex", gap: 4 }}>
+            <button onClick={e => { e.stopPropagation(); onEdit(file); }} style={mediaIconBtn}><Icon name="✏" size={12} /></button>
+            <button onClick={e => { e.stopPropagation(); onDelete(file.id); }} style={{ ...mediaIconBtn, background: "rgba(255,79,94,0.85)", color: "#000" }}><Icon name="✕" size={12} /></button>
+          </div>
+        )}
+      </div>
+      <div style={{ padding: "8px 10px" }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 3 }}>
+          <span style={{ fontSize: 9, color: C.dim }}>{file.sizeStr} · {file.date}</span>
+          {albums && albums.length > 0 && (
+            <div style={{ position: "relative" }}>
+              <button onClick={e => { e.stopPropagation(); setAssignMenu(menuOpen ? null : file.id); }}
+                style={{ background: "none", border: "none", color: C.muted, fontSize: 10, cursor: "pointer", padding: 2 }}>＋Album</button>
+              {menuOpen && (
+                <div style={{ position: "absolute", right: 0, bottom: 22, background: "#1a1b28", border: `0.5px solid ${C.border}`, borderRadius: 8, padding: 6, zIndex: 50, minWidth: 140 }}>
+                  {albums.map(a => (
+                    <button key={a.id} onClick={e => { e.stopPropagation(); assignToAlbum(file.id, a.id); setAssignMenu(null); }}
+                      style={{ display: "block", width: "100%", textAlign: "left", padding: "5px 8px", background: "none", border: "none", color: a.color || C.blue, fontSize: 10, cursor: "pointer", borderRadius: 5 }}>{a.name}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── File Row (footer meta for video / other cards) ──────────
+function FileRow({ file, onDelete, onEdit }) {
+  return (
+    <div style={{ padding: "8px 10px", display: "flex", alignItems: "center", gap: 8 }}>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: C.text, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+        <div style={{ fontSize: 9, color: C.dim }}>{file.sizeStr} · {file.date}</div>
+      </div>
+      <button onClick={() => onEdit(file)} style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(255,255,255,0.05)", border: "none", color: C.muted, fontSize: 10, cursor: "pointer" }}><Icon name="✏" size={12} /></button>
+      <button onClick={() => onDelete(file.id)} style={{ padding: "4px 7px", borderRadius: 6, background: "rgba(255,79,94,0.1)", border: "none", color: C.red, fontSize: 10, cursor: "pointer" }}><Icon name="✕" size={12} /></button>
+    </div>
+  );
+}

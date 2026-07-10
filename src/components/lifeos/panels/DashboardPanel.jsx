@@ -852,7 +852,7 @@ export default function DashboardPanel({ setActive }) {
     // robust load with local fallback for persistence across page changes
     const loadBanner = async () => {
       try {
-        const v = await getApiKey("banner_pic");
+        const v = await kvGet("banner_pic");
         if (v) {
           setBannerPic(v);
           localStorage.setItem("lifeos_banner_pic", v);
@@ -955,7 +955,7 @@ export default function DashboardPanel({ setActive }) {
   async function addTask() {
     if (!newTaskInput.trim()) return;
     const current = await kvGet("tasks_queue") || [];
-    const newT = { id: Date.now(), title: newTaskInput.trim(), done: false };
+    const newT = { id: Date.now(), title: newTaskInput.trim(), priority: "medium", module: "General", done: false };
     const updated = [...current, newT];
     await kvSet("tasks_queue", updated);
     setTasks(updated.filter(t => !t.done).slice(0, 5));
@@ -1050,11 +1050,12 @@ export default function DashboardPanel({ setActive }) {
     reader.onload = async () => {
       const dataUrl = reader.result;
       setBannerPic(dataUrl);
-      const safe = dataUrl.length > 51200 ? dataUrl.substring(0, 51200) : dataUrl;
-      const uid = fbUser?.uid || fbUser?.id;
+      // Persist full image to Worker KV (global, server-side, survives logout;
+      // no localStorage quota limit and no uid-scoping). storage.js mirrors to
+      // localStorage automatically for instant offline reads.
       localStorage.setItem("lifeos_banner_pic", dataUrl);
-      await saveApiKey("banner_pic", safe, uid);
-      await saveApiKey("profile_pic", safe, uid);
+      await kvSet("banner_pic", dataUrl);
+      await kvSet("profile_pic", dataUrl);
       window.dispatchEvent(new CustomEvent('profilePicUpdated', { detail: dataUrl }));
     };
     reader.readAsDataURL(file);

@@ -16,6 +16,10 @@ export default defineConfig({
     strictPort: true,
     allowedHosts: true,
     hmr: { clientPort: 443 },
+    watch: {
+      followSymlinks: false,
+      ignored: ['**/frontend/**', '**/node_modules/**', '**/.git/**', '**/dist/**'],
+    },
   },
   // Use relative paths when building for Electron (file:// protocol)
   base: isElectron ? "./" : "/",
