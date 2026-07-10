@@ -5,6 +5,7 @@
   "type": "module",
   "main": "electron/main.cjs",
   "scripts": {
+    "start": "vite",
     "dev": "vite --force",
     "build": "vite build",
     "deploy": "npx wrangler pages deploy dist --project-name=lifeos1",

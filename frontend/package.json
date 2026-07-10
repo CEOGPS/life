@@ -1,0 +1,7 @@
+{
+  "name": "frontend-launcher",
+  "private": true,
+  "scripts": {
+    "start": "yarn --cwd /app dev"
+  }
+}
