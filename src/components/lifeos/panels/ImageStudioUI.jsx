@@ -1,11 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 import ImageEditorUI from "./ImageEditorUI";
 import ImageGeneratorUI from "./ImageGeneratorUI";
 
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e",
-};
+
 
 export default function ImageStudioUI({ mediaLibrary, onSaveImage, onClose }) {
   const [mode, setMode] = useState("home"); // home | editor | generator

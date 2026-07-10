@@ -1,10 +1,11 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 import Icon from "@/components/lifeos/icons/Icon";
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const C = { blue: "#4ab3f4", purple: "#8b7fff", teal: "#00c896", red: "#ff4f5e" };
+
 
 export default function JournalPanel() {
   const [notebooks, setNotebooks] = useState([]);

@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useEffect } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 import { getErebusCore } from "@/lib/agents/erebus/ErebusCore";
@@ -15,7 +16,7 @@ function loadLifeOSContext() {
   } catch { return { goals: [], tasks: [], calendar: [], crm: [], contacts: [] }; }
 }
 
-const C = { purple: "#8b7fff", blue: "#4ab3f4", teal: "#00c896", orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700" };
+
 
 const DREAM_SYSTEM_PROMPT = `You are the DreamForge Simulator — an AI that turns life visions into data-grounded 6–12 month reality simulations.
 

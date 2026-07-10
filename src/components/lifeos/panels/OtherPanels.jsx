@@ -1,16 +1,17 @@
+import { C as _BASE } from "@/lib/palette";
 import { useState } from "react";
 import { invokeLLM } from "@/api/ceogpsclient.jsx";
 import Icon from "@/components/lifeos/icons/Icon";
 
 const C = {
-  blue: "#4ab3f4", orange: "#ff8c42", teal: "#00c896", purple: "#8b7fff", pink: "#ff6b9d", red: "#ff4f5e",
+  ..._BASE,
   glow: {
-    blue:   "0 0 14px rgba(74,179,244,0.55),  0 0 30px rgba(74,179,244,0.2)",
-    orange: "0 0 14px rgba(255,140,66,0.55),  0 0 30px rgba(255,140,66,0.2)",
-    teal:   "0 0 14px rgba(0,200,150,0.55),   0 0 30px rgba(0,200,150,0.2)",
-    purple: "0 0 14px rgba(139,127,255,0.55), 0 0 30px rgba(139,127,255,0.2)",
-    pink:   "0 0 14px rgba(255,107,157,0.55), 0 0 30px rgba(255,107,157,0.2)",
-  }
+    blue:   `0 0 14px ${_BASE.blue}88,   0 0 30px ${_BASE.blue}33`,
+    orange: `0 0 14px ${_BASE.orange}88, 0 0 30px ${_BASE.orange}33`,
+    teal:   `0 0 14px ${_BASE.teal}88,   0 0 30px ${_BASE.teal}33`,
+    purple: `0 0 14px ${_BASE.purple}88, 0 0 30px ${_BASE.purple}33`,
+    pink:   `0 0 14px ${_BASE.pink}88,   0 0 30px ${_BASE.pink}33`,
+  },
 };
 const card = { background: "#141414", border: "0.5px solid rgba(255,255,255,0.1)", borderRadius: 12 };
 const btn = (col) => ({ padding: "9px 16px", borderRadius: 8, background: "rgba(74,179,244,0.1)", border: "0.5px solid rgba(74,179,244,0.3)", color: col || C.blue, fontSize: 12, fontWeight: 600, cursor: "pointer" });

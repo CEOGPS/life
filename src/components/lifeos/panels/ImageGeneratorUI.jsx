@@ -1,11 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 import { generateImage } from "@/lib/imageProcessingService";
 import Icon from "@/components/lifeos/icons/Icon";
 
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e",
-};
+
 
 const MODES = [
   { id: "realism", name: "Realism", icon: "🏞️", desc: "Realistic landscapes and scenes", color: C.blue },

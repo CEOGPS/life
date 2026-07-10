@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useRef, useEffect } from "react";
 import { invokeLLM } from "@/api/ceogpsclient.jsx";
 import { kvGet, kvSet } from "@/utils/storage";
@@ -6,7 +7,7 @@ import Icon from "@/components/lifeos/icons/Icon";
 const KV_QUEUE = "tasks_queue";
 const KV_BACKLOG = "tasks_backlog";
 
-const C = { blue: "#4ab3f4", orange: "#ff8c42", teal: "#00c896", purple: "#8b7fff", pink: "#ff6b9d", red: "#ff4f5e" };
+
 const card = { background: "#13141f", border: "0.5px solid rgba(255,255,255,0.07)", borderRadius: 12 };
 
 const SOURCE_ICON = { stripe: "💳", github: "📂", gmail: "📬", crm: "👥", agent: "🤖", system: "⚡", calendar: "🗓", slack: "💬" };

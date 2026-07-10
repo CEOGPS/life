@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback } from "react";
 import { invokeLLMWithAuth } from "@/api/ceogpsclient";
 import { useWorkerAuth } from "@/contexts/WorkerContext";
 
-const C = { blue: "#4ab3f4", purple: "#8b7fff", teal: "#00c896", orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700" };
+
 
 // ── AI prompt ────────────────────────────────────────────────────────────────
 const SYSTEM = `You are the Alternate Life Explorer for LifeOS1. You run grounded, multi-domain alternate life simulations based on the user's real context.

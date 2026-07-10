@@ -1,23 +1,10 @@
+import { C } from "@/lib/palette";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Icon from "@/components/lifeos/icons/Icon";
 import { uploadToR2, kvGet, kvSet } from "@/utils/storage";
 
 // ─── THEME ─────────────────────────────────────────────────────────────────
-const C = {
-  bg:     "#080910",
-  panel:  "#0d0e17",
-  card:   "#13141f",
-  border: "rgba(255,255,255,0.07)",
-  blue:   "#4ab3f4",
-  purple: "#8b7fff",
-  pink:   "#ff6b9d",
-  teal:   "#00c896",
-  orange: "#ff8c42",
-  red:    "#ff4f5e",
-  text:   "#f0ede8",
-  muted:  "#6aaedd",
-  dim:    "#3a4a5a",
-};
+
 
 const card = { background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 12 };
 

@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { pink: "#ff6b9d", orange: "#ff8c42", purple: "#8b7fff", blue: "#4ab3f4", teal: "#00c896", red: "#ff4f5e", gold: "#ffd700" };
+
 
 const STORAGE_KEY = "lifeos1_creative_log";
 function loadLog()    { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"); } catch { return []; } }

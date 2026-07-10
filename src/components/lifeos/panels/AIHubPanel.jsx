@@ -1,13 +1,10 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 import AgentPanel from "./AgentPanel";
 import AIModelsPanel from "./AIModelsPanel";
 import ErebusPanel from "./ErebusPanel";
 
-const C = {
-  bg: "#0b0c14", card: "#13141f", border: "rgba(255,255,255,0.07)",
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff", orange: "#ff8c42",
-  text: "#f0ede8", muted: "#6aaedd", erebus: "#9b72cf",
-};
+
 
 const TABS = [
   { id: "erebus", icon: "=",  label: "Erebus",    desc: "Autonomous intelligence core" },

@@ -1,10 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 import { createWebSheet, generateGoogleSheetsURL } from "@/lib/kpiService";
 
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e",
-};
+
 
 export default function WebSheetBuilder({ module, existingSheets, onCreateSheet }) {
   const [showCreateForm, setShowCreateForm] = useState(false);

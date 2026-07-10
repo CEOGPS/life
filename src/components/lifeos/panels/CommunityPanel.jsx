@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect } from "react";
 import { invokeLLM, saveApiKey, getApiKey } from "@/api/ceogpsclient.jsx";
 
 // ── Design tokens ──────────────────────────────────────────────────────────
-const C = { blue:"#4ab3f4", teal:"#00c896", purple:"#8b7fff", orange:"#ff8c42", red:"#ff4f5e", pink:"#ff6b9d", gold:"#ffd700" };
+
 const card  = { background:"#13141f", border:"0.5px solid rgba(255,255,255,0.07)", borderRadius:12 };
 const inp   = { width:"100%", padding:"9px 12px", borderRadius:8, border:"0.5px solid rgba(255,255,255,0.12)", background:"#0d0e17", color:"#f0ede8", fontSize:12, outline:"none", boxSizing:"border-box" };
 const Btn   = ({ children, onClick, color=C.blue, disabled, style={} }) => (

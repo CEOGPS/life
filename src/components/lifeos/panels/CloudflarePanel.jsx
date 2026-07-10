@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef } from "react";
 import { invokeLLMWithAuth } from "@/api/ceogpsclient.jsx";
 import { useWorkerAuth } from "@/contexts/WorkerContext";
@@ -11,7 +12,7 @@ const WORKER_URL = import.meta.env.VITE_WORKER_URL || "https://api.lifeos1.ceogp
 // Remove hardcoded secrets - these will be handled by the worker
 // The worker has CF_API_TOKEN and MAKE_API_KEY as secrets
 
-const C = { blue:"#4ab3f4", orange:"#ff8c42", teal:"#00c896", purple:"#8b7fff", pink:"#ff6b9d", red:"#ff4f5e" };
+
 const card  = { background:"#13141f", border:"0.5px solid rgba(255,255,255,0.07)", borderRadius:12 };
 const inputS = { width:"100%", padding:"9px 12px", borderRadius:8, border:"0.5px solid rgba(255,255,255,0.12)", background:"#0a0b14", color:"#f0ede8", fontSize:13, outline:"none", boxSizing:"border-box" };
 

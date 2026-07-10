@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { orange: "#ff8c42", purple: "#8b7fff", blue: "#4ab3f4", teal: "#00c896", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700" };
+
 
 const STORAGE_KEY = "lifeos1_game_sessions";
 

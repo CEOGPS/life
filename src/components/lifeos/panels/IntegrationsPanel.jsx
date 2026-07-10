@@ -1,16 +1,10 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getPreferredModel, setPreferredModel, MODEL_OPTIONS, generatePKCE } from "../../../api/ceogpsclient.jsx";
 import { useAuth } from "@/lib/FirebaseAuthContext";
 
-const C = {
-  blue: "#4ab3f4",
-  orange: "#ff8c42",
-  teal: "#00c896",
-  purple: "#8b7fff",
-  pink: "#ff6b9d",
-  red: "#ff4f5e"
-};
+
 
 const card = {
   background: "#13141f",

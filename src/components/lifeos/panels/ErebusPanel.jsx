@@ -1,14 +1,10 @@
+import { C } from "@/lib/palette";
 // ErebusPanel.jsx v13 — Media generation + floating avatar
 import { useState, useRef, useEffect, useCallback } from "react";
 import { getErebusCore } from "@/lib/agents/erebus/ErebusCore";
 import { runAgenticTask, runSingleTurn, syncToBackend } from "@/lib/agents/erebus/ErebusAgent";
 
-const C = {
-  bg:"#07080f", bg2:"#0c0d1a", card:"#0f1020",
-  e:"#9b72cf", eHi:"#c4a2f5", eDim:"rgba(155,114,207,0.12)",
-  teal:"#00c896", blue:"#4ab3f4", orange:"#ff8c42", red:"#ff4f5e", green:"#3dd68c",
-  text:"#f0ede8", t2:"#a0a0b8", t3:"#50505a",
-};
+
 
 const MODELS = [
   { id:"auto",     label:"Auto (best available)",   direct:true  },

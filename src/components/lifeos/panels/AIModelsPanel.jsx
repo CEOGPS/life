@@ -1,6 +1,7 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 
-const C = { blue: "#4ab3f4", orange: "#ff8c42", teal: "#00c896", purple: "#8b7fff", pink: "#ff6b9d", red: "#ff4f5e" };
+
 const card = { background: "#13141f", border: "0.5px solid rgba(255,255,255,0.07)", borderRadius: 12 };
 
 const MODELS = [

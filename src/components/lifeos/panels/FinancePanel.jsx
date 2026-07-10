@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef, useCallback } from "react";
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line,
@@ -9,11 +10,7 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 const WORKER = "https://lifeos1.ceogps.workers.dev";
 
-const C = {
-  teal:   "#00c896", blue:   "#4a9eff", purple: "#8b7fff",
-  amber:  "#ffb347", green:  "#3dd68c", red:    "#ff4f5e",
-  pink:   "#ff6b9d", orange: "#ff8c42", gold:   "#ffd700",
-};
+
 
 const TABS = [
   { id: "overview",   icon: "◈",  label: "Overview"      },

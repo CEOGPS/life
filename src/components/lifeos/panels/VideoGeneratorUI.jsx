@@ -1,11 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useRef } from "react";
 import { generateVideo } from "@/lib/videoGenerationService";
 import Icon from "@/components/lifeos/icons/Icon";
 
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700",
-};
+
 
 export default function VideoGeneratorUI({ mediaLibrary, onSaveVideo }) {
   const [selectedImages, setSelectedImages] = useState([]);

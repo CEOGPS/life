@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 import { supabase } from "@/lib/supabaseClient";
 
-const C = { pink: "#ff6b9d", purple: "#8b7fff", orange: "#ff8c42", teal: "#00c896", blue: "#4ab3f4", red: "#ff4f5e", gold: "#ffd700" };
+
 
 // Pull consented contacts from EchoPersona Weaver
 function loadContacts() {

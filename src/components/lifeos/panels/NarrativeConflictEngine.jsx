@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { red: "#ff4f5e", orange: "#ff8c42", purple: "#8b7fff", blue: "#4ab3f4", teal: "#00c896", pink: "#ff6b9d", gold: "#ffd700" };
+
 
 const STORIES_KEY  = "lifeos1_nce_stories";
 const AUDIT_KEY    = "lifeos1_life_audit_notes";

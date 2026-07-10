@@ -36,8 +36,10 @@ import KranosPanel from "@/components/lifeos/panels/KranosPanel";
 import HealthPanel from "@/components/lifeos/panels/HealthPanel";
 import KPIPanelUI from "@/components/lifeos/panels/KPIPanelUI";
 import { initTheme } from "@/lib/theme";
+import { refreshPalette } from "@/lib/palette";
 
 initTheme(); // apply saved theme before first paint
+refreshPalette(); // sync shared palette to the active theme
 
 class AgentDockSafe extends React.Component {
   constructor(props) { super(props); this.state = { crashed: false, error: null }; }
@@ -65,6 +67,18 @@ export default function Home() {
     if (hash) return hash;
     return localStorage.getItem("lifeos_active_panel") || "dashboard";
   });
+
+  // Live theme switching: refresh the shared palette + re-render every panel
+  // when the theme changes (theme.js dispatches "themeChanged").
+  const [, setThemeVersion] = useState(0);
+  useEffect(() => {
+    const onThemeChange = (e) => {
+      refreshPalette(e?.detail?.themeId);
+      setThemeVersion((v) => v + 1);
+    };
+    window.addEventListener("themeChanged", onThemeChange);
+    return () => window.removeEventListener("themeChanged", onThemeChange);
+  }, []);
 
   // Interactive dotted grid background (black + red hover dots)
   // Restored and heavily tuned because it was dropped in a previous UI refactor

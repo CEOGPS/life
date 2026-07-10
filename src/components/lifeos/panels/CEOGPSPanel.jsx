@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef } from "react";
 import Icon from "@/components/lifeos/icons/Icon";
 
@@ -5,7 +6,7 @@ const WORKER = import.meta.env.VITE_WORKER_URL || "https://api.lifeos1.ceogps.co
 const SITE_URL = "https://ceogps.com";
 const ADMIN_URL = "https://ww2.managemydirectory.com/admin";
 
-const C = { teal:"#00c896", blue:"#4a9eff", purple:"#8b7fff", amber:"#ffb347", green:"#3dd68c", red:"#ff4f5e", pink:"#ff6b9d" };
+
 const card = { background:"var(--bg2)", border:"0.5px solid var(--b1)", borderRadius:10 };
 const inp  = { width:"100%", padding:"8px 12px", borderRadius:8, border:"0.5px solid var(--b2)", background:"var(--bg3)", color:"var(--t1)", fontSize:12, outline:"none", boxSizing:"border-box" };
 

@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef } from "react";
 import { useMessaging } from "@/_core/hooks/usemessaging";
 import { useAuth } from "@/lib/FirebaseAuthContext";
 
-const C = { blue: "#4ab3f4", orange: "#ff8c42", teal: "#00c896", purple: "#8b7fff", pink: "#ff6b9d", red: "#ff4f5e" };
+
 
 const PLATFORMS = [
   { id: "sms", icon: "📱", label: "SMS", color: "#00c896" },

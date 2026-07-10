@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState } from "react";
 import { calculateKPIStatus, getKPIColor } from "@/lib/kpiService";
 
-const C = { blue: "#4ab3f4", teal: "#00c896", orange: "#ff8c42", pink: "#ff6b9d" };
+
 
 export default function HealthAnalytics({ kpis, onUpdateKPI }) {
   const [editingId, setEditingId] = useState(null);

@@ -51,3 +51,11 @@ Local-first personal command dashboard. Stack: Vite + React + Electron, backend 
 - planner.py run_task() refactored to 42 lines via _step_event() helper (code review).
 - GLOBAL green fix: BrandIcon.jsx defaulted every brand glyph to neon green (#00ff9d + green glow) when no color prop was passed — this made all platform icons green (esp. Social panel). Changed default to brand-authentic color (simple-icons icon.hex) with a luminance-based light fallback (#e8e8ea) for near-black brands (X/Apple/GitHub). Removed green glow. Affects ALL panels using BrandIcon.
 - Theme system note: initTheme() (LifeOSShell) maps --teal/--accent -> crimson (#ff000d) already, so var(--teal) text is crimson. Remaining literal rgba(0,200,150,*) tints on some pills/buttons are the acceptable "green here and there".
+
+## Session 2026-07-10 (GLOBAL theme unification)
+- Created src/lib/palette.js — single shared `C` palette (crimson/gray/white/black/red + hint green). Values are 6-digit hex for the ~451 `${C.x}NN` alpha-append sites. Dominant crimson-family keys (primary/accent/teal/crimson/e) are derived from the active theme's tokens (lib/theme.js), so the theme switcher re-skins all panels. red/green/blue(gray) are fixed semantic accents.
+- Swapped all 55 panels' local hardcoded `const C = {hex...}` to `import { C } from "@/lib/palette"` (3 with nested glow objects spread _BASE + recolored glow). Imports normalized to top-of-file.
+- LifeOSShell: listens for theme.js 'themeChanged' -> refreshPalette() + re-render. SettingsPanel.pickTheme now reloads after applyTheme for deterministic re-skin (covers module-scope styles).
+- BrandIcon default already fixed to authentic brand colors (prev session).
+- VERIFIED crimson cohesion on Finance, Settings, Social, Contacts, Media, Music (all match homepage: crimson/black/glass, green only as income/positive hint). Compile clean, HTTP 200.
+- NOT FULLY VERIFIED: live switch to a non-crimson theme (e.g. Obsidian gray) — mechanism wired + reload added, but the screenshot tool couldn't capture post-click state to confirm visually.

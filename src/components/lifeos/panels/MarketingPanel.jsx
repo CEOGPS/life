@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect } from "react";
 import { invokeLLM } from "@/lib/ai.js";
 import Icon from "@/components/lifeos/icons/Icon";
 
-const C = { blue:"#4ab3f4", orange:"#ff8c42", teal:"#00c896", purple:"#8b7fff", pink:"#ff6b9d", red:"#ff4f5e", amber:"#ffb347" };
+
 const card = { background:"#1a1a1a", border:"0.5px solid rgba(255,255,255,0.07)", borderRadius:12 };
 const inp = { width:"100%", padding:"9px 14px", borderRadius:8, border:"0.5px solid rgba(255,255,255,0.1)", background:"#0d0e17", fontSize:13, color:"#f0ede8", outline:"none", boxSizing:"border-box" };
 

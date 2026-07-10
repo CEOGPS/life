@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect } from "react";
 import { invokeLLM, saveApiKey, getApiKey } from "@/api/ceogpsclient.jsx";
 
-const C = { blue:"#4ab3f4", teal:"#00c896", purple:"#8b7fff", orange:"#ff8c42", red:"#ff4f5e", pink:"#ff6b9d", green:"#4caf50" };
+
 const card = { background:"#13141f", border:"0.5px solid rgba(255,255,255,0.07)", borderRadius:12 };
 const inp = { width:"100%", padding:"9px 12px", borderRadius:8, border:"0.5px solid rgba(255,255,255,0.12)", background:"#0d0e17", color:"#f0ede8", fontSize:13, outline:"none", boxSizing:"border-box" };
 const btn = (bg, color="#fff") => ({ padding:"8px 18px", borderRadius:8, background:bg, border:"none", color, fontSize:12, fontWeight:600, cursor:"pointer" });

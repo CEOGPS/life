@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { dbFetch } from "@/lib/supabase";
 import Icon from "@/components/lifeos/icons/Icon";
@@ -34,10 +35,7 @@ async function dbDeleteContact(id) {
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  pink: "#ff6b9d", orange: "#ff8c42", red: "#ff4f5e", gold: "#ffd700",
-};
+
 const COLORS = [C.blue, C.teal, C.purple, C.pink, C.orange, C.red, C.gold, "#00bfff"];
 const GROUPS = ["Personal", "Work", "Family", "Business", "VIP", "Other"];
 const groupColor = {

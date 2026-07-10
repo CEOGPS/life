@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useEffect, useRef } from "react";
 import { getProfile, saveProfile, uploadFile } from "@/utils/storage";
 import Icon from "@/components/lifeos/icons/Icon";
@@ -5,20 +6,7 @@ import IntegrationsPanel from "@/components/lifeos/panels/IntegrationsPanel";
 import { THEMES, getActiveTheme, applyTheme } from "@/lib/theme";
 
 // Updated colors to match new theme
-const C = {
-    red: "hsl(355 100% 50%)",        // #ff000d
-    darkred: "hsl(0 100% 25%)",       // #800000
-    darkerred: "hsl(0 67% 18%)",      // #4b0f0f
-    glow: "hsl(355 100% 60%)",        // accent-glow
-    highlight: "hsl(0 0% 85%)",       // metallic-highlight
-    foreground: "hsl(0 0% 94%)",      // #f0f0f0
-    muted: "hsl(0 0% 70%)",           // #7c7c7c
-    muteddark: "hsl(0 0% 30%)",       // #4d4d4d
-    border: "hsl(0 0% 20%)",
-    input: "hsl(0 0% 15%)",
-    card: "hsl(0 0% 8%)",             // #141414
-    background: "hsl(0 0% 0%)"        // #000000
-};
+
 
 const card = {
     background: "hsl(0 0% 8%)",        // #141414
@@ -117,7 +105,12 @@ export default function SettingsPanel() {
     const [theme, setTheme] = useState(getActiveTheme());
     const fileRef = useRef();
 
-    function pickTheme(id) { setTheme(applyTheme(id)); }
+    function pickTheme(id) {
+      setTheme(applyTheme(id));
+      // Reload so the shared palette + every panel rebuild deterministically
+      // from the selected theme's tokens (covers module-scope styles too).
+      setTimeout(() => window.location.reload(), 120);
+    }
 
     useEffect(() => {
         getProfile().then(p => {

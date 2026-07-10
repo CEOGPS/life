@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useEffect } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { dark: "#0a0b12", card: "#1a1e2e", white: "#f0ede8", black: "#111318", gold: "#ffd700", red: "#ff4f5e", teal: "#00c896", purple: "#8b7fff", blue: "#4ab3f4", orange: "#ff8c42" };
+
 
 // ── Static starter deck ──────────────────────────────────────────────────────
 const STARTER_BLACK = [

@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 // EmailPanel.jsx — Full email platform
 // Unified inbox · Folders · Campaigns · Analytics · Warm-up · Domain protection
 import { useState, useEffect, useCallback } from "react";
@@ -97,26 +98,7 @@ function contactSearch(q) {
 }
 
 // ── Theme ─────────────────────────────────────────────────────────────────────
-const C = {
-    bg: "hsl(0 0% 0%)",              // --background
-    card: "hsl(0 0% 8%)",            // --card
-    border: "hsl(0 0% 20%)",         // --border
-    primary: "hsl(355 100% 50%)",    // --primary (#ff000d)
-    primaryDark: "hsl(0 100% 25%)",  // --primary-dark (#800000)
-    primaryDarker: "hsl(0 67% 18%)", // --primary-darker (#4b0f0f)
-    glow: "hsl(355 100% 60%)",       // --accent-glow
-    highlight: "hsl(0 0% 85%)",      // --metallic-highlight
-    text: "hsl(0 0% 94%)",           // --foreground (#f0f0f0)
-    textLight: "#a9a9a9",            // Lighter gray for better visibility
-    t2: "#a9a9a9",                   // --muted-foreground (lighter)
-    t3: "hsl(0 0% 40%)",             // --muted (lighter)
-    teal: "hsl(355 100% 60%)",
-    green: "hsl(355 100% 60%)",
-    orange: "hsl(355 100% 60%)",
-    purple: "hsl(355 100% 60%)",
-    blue: "hsl(355 100% 50%)",
-    red: "hsl(355 100% 50%)",
-};
+
 const S = {
     card: { background: C.card, border: `0.5px solid ${C.border}`, borderRadius: 12 },
     input: { width: "100%", padding: "8px 12px", borderRadius: 8, border: `0.5px solid ${C.border}`, background: C.bg, color: C.text, fontSize: 13, outline: "none", boxSizing: "border-box" },

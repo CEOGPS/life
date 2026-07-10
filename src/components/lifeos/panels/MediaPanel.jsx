@@ -1,3 +1,4 @@
+import { C } from "@/lib/palette";
 import { useState, useRef, useEffect, useCallback } from "react";
 import Icon from "@/components/lifeos/icons/Icon";
 import { uploadToR2, kvGet, kvSet } from "@/utils/storage";
@@ -6,13 +7,7 @@ import ImageStudioUI from "./ImageStudioUI";
 import WritingHubUI from "./WritingHubUI";
 
 // ── Constants ────────────────────────────────────────────────────────────────
-const C = {
-  bg: "#0b0c14", card: "#13141f", card2: "#1a1b2a",
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e",
-  text: "#f0ede8", muted: "#6aaedd", dim: "#3a4a5a",
-  border: "rgba(255,255,255,0.07)",
-};
+
 
 const TABS = ["Images", "Videos", "Music", "Documents", "Files", "Video Generator", "Image Studio", "Writing Hub"];
 

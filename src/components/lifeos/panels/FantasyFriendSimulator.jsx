@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { blue: "#4ab3f4", purple: "#8b7fff", teal: "#00c896", orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700", cyan: "#00e5ff" };
+
 
 const CREW_KEY = "lifeos1_fantasy_crew";
 function load(key, def) { try { return JSON.parse(localStorage.getItem(key) || "null") ?? def; } catch { return def; } }

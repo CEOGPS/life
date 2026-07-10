@@ -1,13 +1,10 @@
+import { C } from "@/lib/palette";
 // ErebusAvatar.jsx — Floating Erebus avatar overlay
 // Draggable widget that lives on top of everything; shows talking-head video or static avatar
 
 import { useState, useRef, useEffect, useCallback } from "react";
 
-const C = {
-  e:"#9b72cf", eHi:"#c4a2f5", eDim:"rgba(155,114,207,0.12)",
-  bg:"#07080f", card:"#0f1020", text:"#f0ede8", t2:"#a0a0b8", t3:"#50505a",
-  teal:"#00c896", orange:"#ff8c42", red:"#ff4f5e",
-};
+
 
 const STATE_GLOW = {
   idle:    "rgba(155,114,207,0.3)",

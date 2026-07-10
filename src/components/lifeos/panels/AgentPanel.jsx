@@ -1,8 +1,9 @@
+import { C } from "@/lib/palette";
 import { useState, useRef, useEffect } from "react";
 import { useWorkerAuth } from "@/contexts/WorkerContext";
 
 const WORKER = import.meta.env.VITE_WORKER_URL || "https://api.lifeos1.ceogps.com";
-const C = { blue:"#4ab3f4", orange:"#ff8c42", teal:"#00c896", purple:"#8b7fff", pink:"#ff6b9d", red:"#ff4f5e", silver:"#c0d8ff" };
+
 const card = { background:"#0f1018", border:"0.5px solid rgba(255,255,255,0.07)", borderRadius:12 };
 
 /* ── Persist helpers ─────────────────────────────────────────────────────── */

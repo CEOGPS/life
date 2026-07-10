@@ -1,9 +1,7 @@
+import { C } from "@/lib/palette";
 import { useState, useRef, useEffect } from "react";
 
-const C = {
-  blue: "#4ab3f4", teal: "#00c896", purple: "#8b7fff",
-  orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e",
-};
+
 
 const TOOLBAR_BUTTONS = [
   { name: "bold", cmd: "bold", label: "B", title: "Bold" },

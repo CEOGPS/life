@@ -1,7 +1,8 @@
+import { C } from "@/lib/palette";
 import { useState, useCallback, useMemo } from "react";
 import { invokeLLM } from "@/api/ceogpsclient";
 
-const C = { purple: "#8b7fff", blue: "#4ab3f4", teal: "#00c896", orange: "#ff8c42", pink: "#ff6b9d", red: "#ff4f5e", gold: "#ffd700" };
+
 
 const BUDGET_KEY  = "lifeos1_shadow_budget";
 const ORACLE_KEY  = "lifeos1_oracle_insights";
