@@ -43,31 +43,33 @@ class ToolExecutor:
 
     def __init__(self, lifeos_data: dict = None):
         self.lifeos_data = lifeos_data or {}
+        # prefix -> (handler, is_async). Dispatch table keeps execute() flat
+        # (low cyclomatic complexity); add a tool by adding one row here.
+        self._dispatch = (
+            ("SEARCH_WEB:",    self._search_web,    True),
+            ("BROWSE_URL:",    self._browse,        True),
+            ("SCRAPE_PAGE:",   self._scrape,        True),
+            ("READ_LIFEOS:",   self._read_lifeos,   False),
+            ("UPDATE_LEAD:",   self._update_lead,   False),
+            ("CREATE_TASK:",   self._create_task,   False),
+            ("REMEMBER_FACT:", self._remember_fact, False),
+            ("DRAFT_EMAIL:",   self._draft_email,   False),
+            ("NOTIFY:",        self._notify,        False),
+        )
 
     async def execute(self, line: str) -> str:
         line = line.strip()
         try:
-            if line.startswith("SEARCH_WEB:"):
-                return await self._search_web(line[11:].strip())
-            if line.startswith("BROWSE_URL:"):
-                return await self._browse(line[11:].strip())
-            if line.startswith("SCRAPE_PAGE:"):
-                return await self._scrape(line[12:].strip())
-            if line.startswith("READ_LIFEOS:"):
-                return self._read_lifeos(line[12:].strip())
-            if line.startswith("UPDATE_LEAD:"):
-                return self._update_lead(line[12:].strip())
-            if line.startswith("CREATE_TASK:"):
-                return self._create_task(line[12:].strip())
-            if line.startswith("REMEMBER_FACT:"):
-                return self._remember_fact(line[14:].strip())
-            if line.startswith("DRAFT_EMAIL:"):
-                return self._draft_email(line[12:].strip())
-            if line.startswith("NOTIFY:"):
-                return f"[Notification queued] {line[7:].strip()}"
+            for prefix, handler, is_async in self._dispatch:
+                if line.startswith(prefix):
+                    arg = line[len(prefix):].strip()
+                    return await handler(arg) if is_async else handler(arg)
         except Exception as e:
             return f"[Tool error] {e}"
         return f"[Unknown tool] {line}"
+
+    def _notify(self, spec: str) -> str:
+        return f"[Notification queued] {spec}"
 
     async def _search_web(self, query: str) -> str:
         """DuckDuckGo instant answers — no API key required."""
@@ -154,6 +156,21 @@ class TaskPlanner:
                 return line[5:].strip()
         return None
 
+    def _seed_history(self, context: str) -> list:
+        history = []
+        if context:
+            history.append({"role": "user",      "content": f"[Context]\n{context}"})
+            history.append({"role": "assistant", "content": "Understood. Ready."})
+        return history
+
+    def _done_event(self, answer: str, step: int) -> dict:
+        return {
+            "type":   "done",
+            "answer": answer,
+            "steps":  step,
+            "model":  self.router.get_active_model(),
+        }
+
     async def run_task(self, task: str, context: str = "") -> AsyncGenerator[dict, None]:
         """
         Agentic loop — yields step dicts for SSE streaming:
@@ -161,13 +178,7 @@ class TaskPlanner:
           {"type": "done",  "answer": "...", "steps": n, "model": "..."}
           {"type": "error", "message": "..."}
         """
-        history = []
-        system  = PLANNER_SYSTEM
-
-        if context:
-            history.append({"role": "user",      "content": f"[Context]\n{context}"})
-            history.append({"role": "assistant",  "content": "Understood. Ready."})
-
+        history  = self._seed_history(context)
         user_msg = f"Task: {task}"
         self.memory.remember("user", user_msg)
 
@@ -176,7 +187,7 @@ class TaskPlanner:
                 response = await self.router.route(
                     message=user_msg,
                     mode="reasoning",
-                    system=system,
+                    system=PLANNER_SYSTEM,
                     history=history,
                 )
             except Exception as e:
@@ -188,46 +199,31 @@ class TaskPlanner:
             done_answer = self._extract_done(response)
             if done_answer:
                 self.memory.remember("assistant", done_answer)
-                yield {
-                    "type":   "done",
-                    "answer": done_answer,
-                    "steps":  step,
-                    "model":  self.router.get_active_model(),
-                }
+                yield self._done_event(done_answer, step)
                 return
 
             tool_line = self._extract_tool_line(response)
-            if tool_line:
-                tool_result = await self.executor.execute(tool_line)
-                yield {
-                    "type":    "step",
-                    "step":    step,
-                    "thought": response.replace(tool_line, "").strip()[:300],
-                    "tool":    tool_line[:120],
-                    "result":  tool_result[:600],
-                }
-                history.append({"role": "assistant", "content": response})
-                history.append({"role": "user",      "content": f"[Tool result]\n{tool_result}"})
-                user_msg = "Continue."
-            else:
+            if not tool_line:
                 # Pure reasoning — treat as final answer
                 self.memory.remember("assistant", response)
-                yield {
-                    "type":   "done",
-                    "answer": response,
-                    "steps":  step,
-                    "model":  self.router.get_active_model(),
-                }
+                yield self._done_event(response, step)
                 return
+
+            tool_result = await self.executor.execute(tool_line)
+            yield {
+                "type":    "step",
+                "step":    step,
+                "thought": response.replace(tool_line, "").strip()[:300],
+                "tool":    tool_line[:120],
+                "result":  tool_result[:600],
+            }
+            history.append({"role": "assistant", "content": response})
+            history.append({"role": "user",      "content": f"[Tool result]\n{tool_result}"})
+            user_msg = "Continue."
 
         # Max steps hit
         last = history[-1]["content"] if history else "No result."
-        yield {
-            "type":   "done",
-            "answer": f"Reached step limit. Last observation: {last[:400]}",
-            "steps":  MAX_STEPS,
-            "model":  self.router.get_active_model(),
-        }
+        yield self._done_event(f"Reached step limit. Last observation: {last[:400]}", MAX_STEPS)
 
     async def run_task_sync(self, task: str, context: str = "") -> dict:
         """Non-streaming — collects all steps and returns final result."""

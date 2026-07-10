@@ -129,25 +129,34 @@ class ModelRouter:
 
     # ── Local fallback (no API required) ──────────────────────────────────────
 
+    # Keyword → canned response rules. Data-driven so local_fallback stays flat
+    # (low cyclomatic complexity) and new intents are added by editing this list.
+    _FALLBACK_RULES = (
+        (("family", "dinner", "jamal", "elena"),
+         "Family protection protocols active. Dinner at 6:30pm is non-negotiable. Jamal soccer 4pm, Elena dance — both locked."),
+        (("lead", "crm", "follow", "sarah", "gino"),
+         "CRM context loaded. Ready to draft outreach or log follow-up. Which lead should I prioritize?"),
+        (("status", "health", "online"),
+         "Erebus autonomous core online. Local file system active. AI model: offline — add GROQ_API_KEY to .env to activate Llama 3.3 (free)."),
+        (("file", "list", "ls", "read"),
+         "File system ready. Use FS_READ or FS_WRITE commands to interact with the virtual filesystem."),
+        (("revenue", "cash", "money", "finance"),
+         "Financial analysis queued. Connect AI model to run pattern analysis on your revenue data."),
+        (("deploy", "vercel", "build", "push"),
+         "Deploy sequence ready. Run `npm run build` then trigger Vercel deploy. Want me to execute?"),
+    )
+
+    _FALLBACK_DEFAULT = (
+        "Local intelligence active — full AI reasoning requires an API key.\n"
+        "Add one of these to advanced_agent/.env:\n"
+        "• GROQ_API_KEY=  (free at groq.com — Llama 3.3 70b)\n"
+        "• GROK_API_KEY=  (xAI Grok — already in your .env, just uncomment)\n"
+        "• OPENAI_API_KEY= (GPT-4o-mini)"
+    )
+
     def local_fallback(self, message: str) -> str:
         t = message.lower()
-        if any(x in t for x in ["family", "dinner", "jamal", "elena"]):
-            return "Family protection protocols active. Dinner at 6:30pm is non-negotiable. Jamal soccer 4pm, Elena dance — both locked."
-        if any(x in t for x in ["lead", "crm", "follow", "sarah", "gino"]):
-            return "CRM context loaded. Ready to draft outreach or log follow-up. Which lead should I prioritize?"
-        if any(x in t for x in ["status", "health", "online"]):
-            return "Erebus autonomous core online. Local file system active. AI model: offline — add GROQ_API_KEY to .env to activate Llama 3.3 (free)."
-        if any(x in t for x in ["file", "list", "ls", "read"]):
-            return "File system ready. Use FS_READ or FS_WRITE commands to interact with the virtual filesystem."
-        if any(x in t for x in ["revenue", "cash", "money", "finance"]):
-            return "Financial analysis queued. Connect AI model to run pattern analysis on your revenue data."
-        if any(x in t for x in ["deploy", "vercel", "build", "push"]):
-            return "Deploy sequence ready. Run `npm run build` then trigger Vercel deploy. Want me to execute?"
-        return (
-            f"Erebus received: \"{message[:120]}\"\n\n"
-            "Local intelligence active — full AI reasoning requires an API key.\n"
-            "Add one of these to advanced_agent/.env:\n"
-            "• GROQ_API_KEY=  (free at groq.com — Llama 3.3 70b)\n"
-            "• GROK_API_KEY=  (xAI Grok — already in your .env, just uncomment)\n"
-            "• OPENAI_API_KEY= (GPT-4o-mini)"
-        )
+        for keywords, response in self._FALLBACK_RULES:
+            if any(x in t for x in keywords):
+                return response
+        return f"Erebus received: \"{message[:120]}\"\n\n{self._FALLBACK_DEFAULT}"
