@@ -31,9 +31,17 @@ export default function TaskOrchestrationPanel() {
 
   // Load persisted tasks once. No mock seeding — an empty board stays empty.
   useEffect(() => {
+    const normalize = (t, i) => ({
+      id: t?.id ?? `task_${Date.now()}_${i}`,
+      title: t?.title ?? t?.text ?? "Untitled task",
+      priority: t?.priority || "medium",
+      module: t?.module || "General",
+      done: !!t?.done,
+      source: t?.source,
+    });
     Promise.all([kvGet(KV_QUEUE), kvGet(KV_BACKLOG)]).then(([q, b]) => {
-      if (Array.isArray(q)) setQueueTasks(q);
-      if (Array.isArray(b)) setBacklog(b);
+      if (Array.isArray(q)) setQueueTasks(q.map(normalize));
+      if (Array.isArray(b)) setBacklog(b.map(normalize));
       setLoaded(true);
     });
   }, []);
@@ -247,6 +255,10 @@ Suggest the optimal execution order for today, grouping by context (calls, desk 
 
 function TaskCard({ task, index, list, onDragStart, onDragEnter, onDrop, onToggleDone, onDelete, onMove, moveLabel }) {
   const [dragging, setDragging] = useState(false);
+  // Defensive defaults: tasks added from the Dashboard / integrations may omit
+  // priority/module. Without this, task.priority.toUpperCase() crashes the app.
+  const priority = task.priority || "medium";
+  const moduleName = task.module || "General";
   const src = task.source;
   const srcColor = src ? (SOURCE_COLOR[src.source] || C.blue) : C.blue;
   const srcIcon  = src ? (SOURCE_ICON[src.source]  || "⚡")   : "✏";
@@ -267,7 +279,7 @@ function TaskCard({ task, index, list, onDragStart, onDragEnter, onDrop, onToggl
         alignItems: "flex-start",
         cursor: "grab",
         opacity: dragging ? 0.4 : task.done ? 0.55 : 1,
-        borderLeft: `2px solid ${PRIORITY_COLOR[task.priority]}`,
+        borderLeft: `2px solid ${PRIORITY_COLOR[priority] || C.orange}`,
         transition: "all .15s",
         userSelect: "none",
       }}>
@@ -288,12 +300,12 @@ function TaskCard({ task, index, list, onDragStart, onDragEnter, onDrop, onToggl
         </div>
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
           {/* Priority badge */}
-          <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 20, background: PRIORITY_BG[task.priority], color: PRIORITY_COLOR[task.priority], fontWeight: 700 }}>
-            {task.priority.toUpperCase()}
+          <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 20, background: PRIORITY_BG[priority] || PRIORITY_BG.medium, color: PRIORITY_COLOR[priority] || C.orange, fontWeight: 700 }}>
+            {priority.toUpperCase()}
           </span>
           {/* Module badge */}
-          <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 20, background: (MODULE_COLOR[task.module] || C.blue) + "18", color: MODULE_COLOR[task.module] || C.blue, fontWeight: 600 }}>
-            {task.module}
+          <span style={{ fontSize: 9, padding: "2px 7px", borderRadius: 20, background: (MODULE_COLOR[moduleName] || C.blue) + "18", color: MODULE_COLOR[moduleName] || C.blue, fontWeight: 600 }}>
+            {moduleName}
           </span>
           {/* Source badge */}
           {src && (

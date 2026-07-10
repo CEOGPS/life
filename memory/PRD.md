@@ -25,3 +25,6 @@ Local-first personal command dashboard. Stack: Vite + React + Electron, backend 
 - File/media storage: playbook retrieved, EMERGENT_LLM_KEY available. NOT yet wired.
 - Twilio SMS: playbook retrieved; awaiting ACCOUNT_SID/AUTH_TOKEN/phone number.
 - Auth: Firebase Google auth (existing) — recommended for Electron.
+
+## Bug Fixes
+- 2026-07-10: Task Orchestration panel crash — tasks added via Dashboard write to `tasks_queue` without a `priority`, and TaskCard called `task.priority.toUpperCase()` on undefined (ErrorBoundary blanked the app). Fixed with defensive defaults in TaskCard + task normalization on load in TaskOrchestrationPanel.jsx.
