@@ -46,3 +46,8 @@ Local-first personal command dashboard. Stack: Vite + React + Electron, backend 
 - Messages: DEFER — user will overhaul.
 - Theme sweep: teal (#00c896)/blue accents -> crimson across panels (Media buttons still teal).
 - Kranos + Hermes/Qwen 3.6 agent (user sent qwen.zip: qwen/QWEN.md + qwen/creator.js) and Erebus verification. CreatorOS1.
+
+## Session 2026-07-10 (theme / green optimization)
+- planner.py run_task() refactored to 42 lines via _step_event() helper (code review).
+- GLOBAL green fix: BrandIcon.jsx defaulted every brand glyph to neon green (#00ff9d + green glow) when no color prop was passed — this made all platform icons green (esp. Social panel). Changed default to brand-authentic color (simple-icons icon.hex) with a luminance-based light fallback (#e8e8ea) for near-black brands (X/Apple/GitHub). Removed green glow. Affects ALL panels using BrandIcon.
+- Theme system note: initTheme() (LifeOSShell) maps --teal/--accent -> crimson (#ff000d) already, so var(--teal) text is crimson. Remaining literal rgba(0,200,150,*) tints on some pills/buttons are the acceptable "green here and there".

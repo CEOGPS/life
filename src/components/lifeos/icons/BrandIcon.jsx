@@ -95,11 +95,19 @@ export default function BrandIcon({ slug, size = 16, color, title, style }) {
       </span>
     );
   }
-  // Default to "glowing green" when no explicit color is passed.
-  // Brand-authentic colors still work if the panel passes color="#xxxxxx".
-  const NEON = "#00ff9d";
-  const fill = color || NEON;
-  const glow = color ? "none" : `drop-shadow(0 0 4px ${NEON}88) drop-shadow(0 0 1px ${NEON})`;
+  // Default to the brand-authentic color (each simple-icons glyph carries its
+  // official hex). Near-black brands (X, Apple, GitHub) would vanish on the
+  // dark UI, so those fall back to a light neutral. No more neon-green default.
+  const brandHex = icon.hex ? `#${icon.hex}` : null;
+  const isNearBlack = (hex) => {
+    if (!hex || hex.length < 6) return false;
+    const r = parseInt(hex.slice(0, 2), 16);
+    const g = parseInt(hex.slice(2, 4), 16);
+    const b = parseInt(hex.slice(4, 6), 16);
+    return (0.299 * r + 0.587 * g + 0.114 * b) < 45;
+  };
+  const fill = color || (isNearBlack(icon.hex) ? "#e8e8ea" : brandHex) || "#e8e8ea";
+  const glow = "none";
   return (
     <svg
       role="img"
