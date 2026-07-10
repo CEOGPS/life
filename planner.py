@@ -171,13 +171,17 @@ class TaskPlanner:
             "model":  self.router.get_active_model(),
         }
 
+    def _step_event(self, step: int, response: str, tool_line: str, tool_result: str) -> dict:
+        return {
+            "type":    "step",
+            "step":    step,
+            "thought": response.replace(tool_line, "").strip()[:300],
+            "tool":    tool_line[:120],
+            "result":  tool_result[:600],
+        }
+
     async def run_task(self, task: str, context: str = "") -> AsyncGenerator[dict, None]:
-        """
-        Agentic loop — yields step dicts for SSE streaming:
-          {"type": "step",  "step": n, "thought": "...", "tool": "...", "result": "..."}
-          {"type": "done",  "answer": "...", "steps": n, "model": "..."}
-          {"type": "error", "message": "..."}
-        """
+        """Agentic loop — yields {"type": step|done|error, ...} dicts for SSE streaming."""
         history  = self._seed_history(context)
         user_msg = f"Task: {task}"
         self.memory.remember("user", user_msg)
@@ -210,13 +214,7 @@ class TaskPlanner:
                 return
 
             tool_result = await self.executor.execute(tool_line)
-            yield {
-                "type":    "step",
-                "step":    step,
-                "thought": response.replace(tool_line, "").strip()[:300],
-                "tool":    tool_line[:120],
-                "result":  tool_result[:600],
-            }
+            yield self._step_event(step, response, tool_line, tool_result)
             history.append({"role": "assistant", "content": response})
             history.append({"role": "user",      "content": f"[Tool result]\n{tool_result}"})
             user_msg = "Continue."
